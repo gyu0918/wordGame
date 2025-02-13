@@ -3,8 +3,11 @@ import java.util.*;
 
 public class crazyBBuyooBBuyoo {
     static Scanner in = new Scanner(System.in);
+
     static Random rand = new Random();
-    static File file = new File("d:\\example\\writeFile.txt");
+//    static File file = new File("d:\\example\\writeFile.txt");
+    static File file = new File("/Users/junggkim/Desktop/myfile.txt");
+
 
     static int[][] a = new int[7][7];
     static int[][] second = new int[a.length][a[0].length];
@@ -22,8 +25,8 @@ public class crazyBBuyooBBuyoo {
     public static void main(String[] args) throws IOException {
 
         while (!stop) {
-            if (startMenu())
-                    break ;
+            login();
+            //startMenu();
             gameStart();
             // a -> second
 //            copyArray(1);
@@ -36,48 +39,60 @@ public class crazyBBuyooBBuyoo {
 //                break ;
         }
     }
-    public static boolean startMenu() throws IOException {
+
+    //txt파일에서 회원 아이디 찾는 메서드
+    public static boolean searchIdOrPassword(String id,String pwd,boolean flag) throws IOException{
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        //아이디만 찾을경우 flag = true  비번을 찾을경우 flag = false
+
+        String str;
+        while ((str = br.readLine()) != null) {
+            String[] part = str.split(",");
+            if (part[0].equals(id)) {
+                if (!flag){
+                    if (part[1].equals(pwd)){
+                        br.close();
+                        return true;
+                    }
+                }
+                br.close();
+                return false;
+            }
+
+        }
+        br.close();
+        return true;
+    }
+    public static void login() throws IOException {
         //파일 존재 여부 체크 및 생성
         if (!file.exists()){
             file.createNewFile();
          }
-        BufferedWriter bw = new BufferedWriter(new FileWriter("d:\\example\\writeFile.txt"));
-        BufferedReader br = new BufferedReader(new FileReader("d:\\example\\writeFile.txt"));
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file,true));  //append모드
         //로그인 부터
         System.out.println("아이디를 입력하세요.");
         String name = in.nextLine();
-        boolean idCheck = true;
-        int nullCnt = 0;
-        //중복 체크
-        String str;
-        while ((str = br.readLine()) != null) {
-            if (str.equals(name)) {
-                idCheck = false;
-            }
-        }
-        br.close();
 
-        //회원가입부분
-        if (idCheck) {
+        //텍스트 파일에 아이디,비밀번호,점수,코인개수,폭탄아이템개수,십자가아이템개수,선택숫자삭제아이템개수
+        //id 검색 + 회원가입부분
+        if (searchIdOrPassword(name,null,true)) {
             System.out.println("아이디가 없네요 해당 아이디로 회원가입을 시작하겠습니다. 비번을 입력하세요.");
-            bw.write(name + ",");
             String password = in.nextLine();
-            bw.write(password + ",");
+            bw.write(name + "," + password + "," + ",0,0,0,0,0\n");
+            System.out.println("id = " + name + " password = " + password);
             bw.close();
         }else{ //로그인 부분
             while(true){
                 System.out.println("비번을 입력하세요.");
                 String password = in.nextLine();
-                String nameExit;
-                //해당아이디에 찾아가서 비번 맞는지 체크
-                while ((nameExit = br.readLine()) != null) {
-                    if (nameExit.equals(name)) {
-                        if
-                    }
+                if(searchIdOrPassword(name,password,false)){
+                    break ;
+                }else{
+                    System.out.println("비번이 틀렸습니다 다시 입력해주세요.");
                 }
             }
         }
-        return true;
     }
     public static void gameStart() {
         int rr = rand.nextInt(7) + 1;
